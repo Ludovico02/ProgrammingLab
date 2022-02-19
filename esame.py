@@ -28,10 +28,15 @@ class CSVTimeSeriesFile():
             try:
                 elements[-1] = int(elements[-1])
             except:
-                print("Uso valore di default") # togliere?
                 # dato che il numero non è convertibile in intero, il numero è una str
-                elements[-1] = None # se non è un numero metto a none
-            
+                elements[-1] = None
+
+            if elements[-1] != None and elements[-1] <= 0: # se il valore è minore di 0 o nullo (= 0)
+                elements[-1] = None
+
+            if len(elements) < 2:
+                elements.insert(0, "")
+        
             if elements[0] != "date": # aggiungere verifiche?
                 data.append(elements)
             
