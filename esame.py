@@ -1,6 +1,7 @@
 '''
 - se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezzione
 - timestamp duplicato 
+- la data deve avere il - ?
 '''
 # import re
 
@@ -38,8 +39,8 @@ class CSVTimeSeriesFile():
                 elements = [aux, num]
 
             # rimuovo eventuali spazi o "a capo" dagli elementi
-            elements[-1] = elements[-1].strip()
-            elements[0] = elements[0].strip()
+            # elements[-1] = elements[-1].strip()
+            # elements[0] = elements[0].strip()
 
             try:
                 elements[-1] = int(elements[-1])
@@ -65,6 +66,7 @@ class CSVTimeSeriesFile():
 def detect_similar_monthly_variations(time_series, years):
     if len(years) > 2:
         raise ExamException("Non deve avere più di 2 valori")
+
     try:
         years[0] = int(years[0])
         years[1] = int(years[1])
@@ -78,13 +80,14 @@ def detect_similar_monthly_variations(time_series, years):
             raise ExamException("Gli anni non sono consecutivi")
     
     first_found, second_found = False, False
-    for i, list in enumerate(time_series):
+    for list in time_series:
         if str(years[0]) in list[0] and first_found == False:
             first_found = True
         if str(years[1]) in list[0] and second_found == False:
             second_found = True
         if first_found and second_found:
             break
+    
     if not first_found or not second_found:
         raise ExamException("Uno dei due anni non è presente nella lista")
 
@@ -97,20 +100,20 @@ def detect_similar_monthly_variations(time_series, years):
     print(first)
     print(second)
 
-    # first = [abs(first[i - 1] - first[i]) for i in range(1, len(first))]
-    for i in range(len(first) - 1):
-        if first[i] == None or first[i + 1] == None:
-            first[i] = None
-        else:
-            first[i] = abs(first[i] - first[i + 1])
-    first.pop()
-    # second = [abs(second[i] - second[i + 1]) for i in range(len(second) - 1)]
-    for i in range(len(second) - 1):
-        if second[i] == None or second[i + 1] == None:
-            second[i] = None
-        else:
-            second[i] = abs(second[i] - second[i + 1])
-    second.pop()
+    first = [None if first[i] == None or first[i + 1] == None else abs(first[i] - first[i + 1]) for i in range(len(first) - 1)]
+    # for i in range(len(first) - 1):
+    #     if first[i] == None or first[i + 1] == None:
+    #         first[i] = None
+    #     else:
+    #         first[i] = abs(first[i] - first[i + 1])
+    # first.pop()
+    second = [None if second[i] == None or second[i + 1] == None else abs(second[i] - second[i + 1]) for i in range(len(second) - 1)]
+    # for i in range(len(second) - 1):
+    #     if second[i] == None or second[i + 1] == None:
+    #         second[i] = None
+    #     else:
+    #         second[i] = abs(second[i] - second[i + 1])
+    # second.pop()
     print(first)
     print(second)
 
@@ -124,7 +127,7 @@ def detect_similar_monthly_variations(time_series, years):
             finale.append(False)
     for i in range(12 - len(finale)):
         finale.append(False)
-    print(finale, len(finale))
+    print(finale, len(finale)) # return
 
 '''
 time_series_file = CSVTimeSeriesFile(name='data.csv')
