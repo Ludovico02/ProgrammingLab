@@ -58,7 +58,8 @@ def detect_similar_monthly_variations(time_series, years):
             second_found = True
         if first_found and second_found:
             break
-    print(first_year_i, second_year_i)
+    if not first_found or not second_found:
+        raise ExamException("Uno dei due anni non è presente nella lista")
 
     first, second = [], []
     for list in time_series:
@@ -69,19 +70,41 @@ def detect_similar_monthly_variations(time_series, years):
     print(first)
     print(second)
 
-    first = [abs(first[i] - first[i + 1]) for i in range(len(first) - 1)]
-    second = [abs(second[i] - second[i + 1]) for i in range(len(second) - 1)]
-    print(first, second)
+    # first = [abs(first[i - 1] - first[i]) for i in range(1, len(first))]
+    for i in range(len(first) - 1):
+        if first[i] == None or first[i + 1] == None:
+            first[i] = None
+        else:
+            first[i] = abs(first[i] - first[i + 1])
+    first.pop()
+    # second = [abs(second[i] - second[i + 1]) for i in range(len(second) - 1)]
+    for i in range(len(second) - 1):
+        if second[i] == None or second[i + 1] == None:
+            second[i] = None
+        else:
+            second[i] = abs(second[i] - second[i + 1])
+    second.pop()
+    print(first)
+    print(second)
 
     finale = []
     for x, y in zip(first, second):
-        if abs(x - y) <= 2:
+        if x == None or y == None:
+            finale.append(False)
+        elif abs(x - y) <= 2:
             finale.append(True)
         else:
             finale.append(False)
     print(finale)
 
+'''
 time_series_file = CSVTimeSeriesFile(name='data.csv')
+time_series = time_series_file.get_data()
+print(time_series)
+
+detect_similar_monthly_variations(time_series, [1949, 1950])
+'''
+time_series_file = CSVTimeSeriesFile(name='dati_sbagliati.csv')
 time_series = time_series_file.get_data()
 print(time_series)
 
