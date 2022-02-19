@@ -53,13 +53,11 @@ def detect_similar_monthly_variations(time_series, years):
         else:
             raise ExamException("Gli anni non sono consecutivi")
     
-    first_year_i, first_found, second_year_i, second_found = 0, False, 0, False
+    first_found, second_found = False, False
     for i, list in enumerate(time_series):
         if str(years[0]) in list[0] and first_found == False:
-            first_year_i = i
             first_found = True
         if str(years[1]) in list[0] and second_found == False:
-            second_year_i = i
             second_found = True
         if first_found and second_found:
             break
@@ -100,7 +98,9 @@ def detect_similar_monthly_variations(time_series, years):
             finale.append(True)
         else:
             finale.append(False)
-    print(finale)
+    for i in range(12 - len(finale)):
+        finale.append(False)
+    print(finale, len(finale))
 
 '''
 time_series_file = CSVTimeSeriesFile(name='data.csv')
