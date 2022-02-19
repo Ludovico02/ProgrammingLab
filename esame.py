@@ -1,25 +1,41 @@
+'''
+- se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezzione
+- timestamp duplicato 
+'''
+# import re
+
 class ExamException(Exception):
     pass # raise ExamException('Errore')
 
 class CSVTimeSeriesFile():
     def __init__(self, name):
         self.name = name
-        self.can_read = True
+
+    def get_data(self):
         try:
             my_file = open(self.name, "r")
             my_file.readline()
         except Exception as e:
-            self.can_read = False
-            print("Errore in apertura del file: {}".format(e))
-
-    def get_data(self):
-        if not self.can_read:
-            print("Errore, file non aperto o illeggibile")
-            return None
+            raise ExamException("Errore in apertura del file: {}".format(e))
+            
         data = []
         my_file = open(self.name, "r")
         for line in my_file:
             elements = line.split(",")
+            
+            elements = [element.replace(" ", "").strip() for element in elements]
+
+            if len(elements) > 2:
+                aux, num = "", ""
+                data_found, num_found = False, False
+                for element in elements:
+                    if "-" in element and element.replace("-","").isnumeric() and not data_found:
+                        data_found = True
+                        aux = element
+                    if element.isnumeric() and not num_found:
+                        num_found = True
+                        num = element
+                elements = [aux, num]
 
             # rimuovo eventuali spazi o "a capo" dagli elementi
             elements[-1] = elements[-1].strip()
@@ -37,7 +53,9 @@ class CSVTimeSeriesFile():
             if len(elements) < 2:
                 elements.insert(0, "")
         
-            if elements[0] != "date": # aggiungere verifiche?
+            # if re.match("[0-9\-]*$", elements[0]): # aggiungere verifiche?
+            #     data.append(elements)
+            if "-" in elements[0] and elements[0].replace("-", "").isnumeric():
                 data.append(elements)
             
         my_file.close()
@@ -47,6 +65,12 @@ class CSVTimeSeriesFile():
 def detect_similar_monthly_variations(time_series, years):
     if len(years) > 2:
         raise ExamException("Non deve avere più di 2 valori")
+    try:
+        years[0] = int(years[0])
+        years[1] = int(years[1])
+    except:
+        raise ExamException("Gli anni devono essere numeri interi")
+
     if years[0] != years[1] - 1:
         if years[0] - 1 == years[1]: # se il primo anno è maggiore del secondo
             years[0], years[1] = years[1], years[0]
@@ -111,6 +135,6 @@ detect_similar_monthly_variations(time_series, [1949, 1950])
 '''
 time_series_file = CSVTimeSeriesFile(name='dati_sbagliati.csv')
 time_series = time_series_file.get_data()
-print(time_series)
+print(time_series, len(time_series))
 
 detect_similar_monthly_variations(time_series, [1949, 1950])
