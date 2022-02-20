@@ -1,6 +1,7 @@
 '''
 - se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezzione
 - la data deve avere il -
+- gli anni possono essere messi in ordine decrescente?
 '''
 
 class ExamException(Exception):
@@ -17,8 +18,7 @@ class CSVTimeSeriesFile():
         except Exception as e:
             raise ExamException("Errore in apertura del file: {}".format(e))
 
-        c = 1 # contatore
-        data = [["1921-01", 5]]
+        data = []
         my_file = open(self.name, "r")
         for line in my_file:
             elements = line.split(",")
@@ -71,14 +71,26 @@ class CSVTimeSeriesFile():
                 # verifico che non ci siano duplicati
                 if verify_year and verify_month:
                     if len(data) > 1:
-                        if int(data[len(data) - 1][0][:data[len(data) - 1][0].find("-")]) > year:
-                            raise ExamException("Anno fuori ordine")
+                        data_year = int(data[len(data) - 1][0][:data[len(data) - 1][0].find("-")])
+                        data_month = int(data[len(data) - 1][0][data[len(data) - 1][0].find("-") + 1:])
+                        c_year, c_month = False, False
 
-                    if len(data) > 1:
-                        if int(data[len(data) - 1][0][data[len(data) - 1][0].find("-") + 1:]) > month and month != 1:
-                            print(data)
+                    if len(data) == 2:
+                        if data_year < year:
+                            c_year = True
+                        if data_month < month:
+                            c_month = True
+
+                    if len(data) > 2:
+                        if data_year > year and not c_year:
+                            raise ExamException("Anno fuori ordine")
+                        if data_month > month and year == data_year and not c_month:
                             raise ExamException("Mese fuori ordine")
-                            
+                        if data_year < year and c_year:
+                            raise ExamException("Anno fuori ordine")
+                        if data_month > month and year == data_year and c_month:
+                            raise ExamException("Mese fuori ordine")
+
                     for el in data:
                         if elements[0] in el:
                             raise ExamException("Data duplicata")
@@ -129,6 +141,9 @@ def detect_similar_monthly_variations(time_series, years):
     print(second)
     print(first_months)
     print(second_months)
+
+    first_months.sort()
+    second_months.sort()
 
     for i in range(len(first_months) - 1):
         if i == 0 and first_months[i] != 1:
