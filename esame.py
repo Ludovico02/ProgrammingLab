@@ -22,9 +22,12 @@ class CSVTimeSeriesFile():
         my_file = open(self.name, "r")
         for line in my_file:
             elements = line.split(",")
-            
+
+            # tolgo tutti gli spazi dagli elementi
             elements = [element.replace(" ", "").strip() for element in elements]
 
+            # in caso ci siano più di 2 elementi separati dalla virgola
+            # il primo elemento deve comunque essere una data
             if len(elements) > 2 and elements[0].count("-") == 1 and elements[0].replace("-", "").isnumeric():
                 aux, num = elements[0], ""
                 num_found = False
@@ -37,6 +40,7 @@ class CSVTimeSeriesFile():
             # if re.match("[0-9\-]*$", elements[0]): # aggiungere verifiche?
             #     data.append(elements)
 
+            # se il primo elemento è una data
             if elements[0].count("-") == 1 and elements[0].replace("-", "").isnumeric() and len(elements) == 2:
 
                 try:
@@ -73,22 +77,11 @@ class CSVTimeSeriesFile():
                     if len(data) > 1:
                         data_year = int(data[len(data) - 1][0][:data[len(data) - 1][0].find("-")])
                         data_month = int(data[len(data) - 1][0][data[len(data) - 1][0].find("-") + 1:])
-                        c_year, c_month = False, False
 
-                    if len(data) == 2:
-                        if data_year < year:
-                            c_year = True
-                        if data_month < month:
-                            c_month = True
-
-                    if len(data) > 2:
-                        if data_year > year and not c_year:
+                    if len(data) > 1:
+                        if data_year > year:
                             raise ExamException("Anno fuori ordine")
-                        if data_month > month and year == data_year and not c_month:
-                            raise ExamException("Mese fuori ordine")
-                        if data_year < year and c_year:
-                            raise ExamException("Anno fuori ordine")
-                        if data_month > month and year == data_year and c_month:
+                        if data_month > month and year == data_year:
                             raise ExamException("Mese fuori ordine")
 
                     for el in data:
@@ -142,6 +135,7 @@ def detect_similar_monthly_variations(time_series, years):
     print(first_months)
     print(second_months)
 
+    # tolgiere
     first_months.sort()
     second_months.sort()
 
@@ -150,7 +144,8 @@ def detect_similar_monthly_variations(time_series, years):
             for j in range(first_months[i] - 1):
                 first.insert(j, None)
         if first_months[i] != first_months[i + 1] - 1:
-            first.insert(first_months[i], None)
+            for j in range(first_months[i] + 1, first_months[i + 1]):
+                first.insert(first_months[i], None)
     if first_months[-1] != 12:
         for i in range(12 - first_months[-1]):
             first.append(None)
@@ -160,7 +155,8 @@ def detect_similar_monthly_variations(time_series, years):
             for j in range(second_months[i] - 1):
                 second.insert(j, None)
         if second_months[i] != second_months[i + 1] - 1:
-            second.insert(second_months[i], None)
+            for j in range(second_months[i] + 1, second_months[i + 1]):
+                first.insert(second_months[i], None)
     if second_months[-1] != 12:
         for i in range(12 - second_months[-1]):
             second.append(None)
@@ -183,8 +179,8 @@ def detect_similar_monthly_variations(time_series, years):
             finale.append(True)
         else:
             finale.append(False)
-    for i in range(11 - len(finale)):
-        finale.append(False)
+    # for i in range(11 - len(finale)):
+    #     finale.append(False)
     print(finale, len(finale)) # return
 
 '''
@@ -194,7 +190,7 @@ print(time_series)
 
 detect_similar_monthly_variations(time_series, [1949, 1950])
 '''
-time_series_file = CSVTimeSeriesFile(name='data.csv')
+time_series_file = CSVTimeSeriesFile(name='prove.csv')
 time_series = time_series_file.get_data()
 print(time_series, len(time_series))
 
