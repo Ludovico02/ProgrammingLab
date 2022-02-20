@@ -16,21 +16,19 @@ class CSVTimeSeriesFile():
             my_file.readline()
         except Exception as e:
             raise ExamException("Errore in apertura del file: {}".format(e))
-            
-        data = []
+
+        c = 1 # contatore
+        data = [["1921-01", 5]]
         my_file = open(self.name, "r")
         for line in my_file:
             elements = line.split(",")
             
             elements = [element.replace(" ", "").strip() for element in elements]
-            # cambia
-            if len(elements) > 2:
-                aux, num = "", ""
-                data_found, num_found = False, False
+
+            if len(elements) > 2 and elements[0].count("-") == 1 and elements[0].replace("-", "").isnumeric():
+                aux, num = elements[0], ""
+                num_found = False
                 for element in elements:
-                    if "-" in element and element.replace("-","").isnumeric() and not data_found:
-                        data_found = True
-                        aux = element
                     if element.isnumeric() and not num_found:
                         num_found = True
                         num = element
@@ -40,7 +38,7 @@ class CSVTimeSeriesFile():
             #     data.append(elements)
 
             if elements[0].count("-") == 1 and elements[0].replace("-", "").isnumeric() and len(elements) == 2:
-                
+
                 try:
                     elements[-1] = int(elements[-1])
                 except:
@@ -67,13 +65,24 @@ class CSVTimeSeriesFile():
                     verify_year = False
                 if year <= 0:
                     verify_year = False
+
+
+                    
+                # verifico che non ci siano duplicati
                 if verify_year and verify_month:
-                    dupl = False
+                    if len(data) > 1:
+                        if int(data[len(data) - 1][0][:data[len(data) - 1][0].find("-")]) > year:
+                            raise ExamException("Anno fuori ordine")
+
+                    if len(data) > 1:
+                        if int(data[len(data) - 1][0][data[len(data) - 1][0].find("-") + 1:]) > month and month != 1:
+                            print(data)
+                            raise ExamException("Mese fuori ordine")
+                            
                     for el in data:
                         if elements[0] in el:
-                            dupl = True
-                    if not dupl:
-                        data.append(elements)
+                            raise ExamException("Data duplicata")
+                    data.append(elements)
             
         my_file.close()
         return data
@@ -170,7 +179,7 @@ print(time_series)
 
 detect_similar_monthly_variations(time_series, [1949, 1950])
 '''
-time_series_file = CSVTimeSeriesFile(name='dati_sbagliati.csv')
+time_series_file = CSVTimeSeriesFile(name='data.csv')
 time_series = time_series_file.get_data()
 print(time_series, len(time_series))
 
