@@ -2,6 +2,8 @@
 - se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezzione
 - la data deve avere il -
 - gli anni possono essere messi in ordine decrescente?
+- per verificare se c'è un duplicato mi basterebbe controllare l'anno prima visto che altrimenti viene alzata l'eccezione di anno o mese fuori ordine
+- togliere abs
 '''
 
 class ExamException(Exception):
