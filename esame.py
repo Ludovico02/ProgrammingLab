@@ -133,54 +133,18 @@ def detect_similar_monthly_variations(time_series, years):
         raise ExamException("Uno dei due anni non è presente nella lista")
 
     # aggiungo a delle liste i valori corrispondenti agli anni
-    # creo altri due array dove inserisco i mesi
-    first, second = [], []
-    first_months, second_months = [], []
+    first, second = [None] * 12, [None] * 12
     for list in time_series:
         if str(years[0]) in list[0]:
-            first.append(list[1])
-            first_months.append(int(list[0][list[0].find("-") + 1:]))
+            first[int(list[0][list[0].find("-") + 1:]) - 1] = list[1]
         if str(years[1]) in list[0]:
-            second_months.append(int(list[0][list[0].find("-") + 1:]))
-            second.append(list[1])
+            second[int(list[0][list[0].find("-") + 1:]) - 1] = list[1]
     print(first)
     print(second)
-    print(first_months)
-    print(second_months)
-
-    # tolgiere se anni e mesi sono sempre da considerarsi in ordine crescente
-    first_months.sort()
-    second_months.sort()
-
-    # aggiungo ai valori soprastanti None dove manca il mese
-    for i in range(len(first_months) - 1):
-        if i == 0 and first_months[i] != 1:
-            for j in range(first_months[i] - 1):
-                first.insert(j, None)
-        if first_months[i] != first_months[i + 1] - 1:
-            for j in range(first_months[i], first_months[i + 1] - 1):
-                first.insert(j, None) # da vedere
-    if first_months[-1] != 12:
-        for i in range(12 - first_months[-1]):
-            first.append(None)
-
-    for i in range(len(second_months) - 1):
-        if i == 0 and second_months[i] != 1:
-            for j in range(second_months[i] - 1):
-                second.insert(j, None)
-        if second_months[i] != second_months[i + 1] - 1:
-            for j in range(second_months[i], second_months[i + 1] - 1):
-                second.insert(j, None)
-    if second_months[-1] != 12:
-        for i in range(12 - second_months[-1]):
-            second.append(None)
-
-    print("primo =", first, len(first))
-    print("secondo =", second, len(second))
 
     # faccio le sottrazioni fra gli elementi del vettore stesso, se sottraggo un valore con None, inserisco None
-    first = [None if first[i] == None or first[i + 1] == None else abs(first[i] - first[i + 1]) for i in range(len(first) - 1)]
-    second = [None if second[i] == None or second[i + 1] == None else abs(second[i] - second[i + 1]) for i in range(len(second) - 1)]
+    first = [None if first[i] == None or first[i + 1] == None else first[i + 1] - first[i] for i in range(len(first) - 1)]
+    second = [None if second[i] == None or second[i + 1] == None else second[i + 1] - second[i] for i in range(len(second) - 1)]
 
     print("p2 =", first, len(first))
     print("s2 =", second, len(second))
