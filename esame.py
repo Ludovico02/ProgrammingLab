@@ -156,8 +156,8 @@ def detect_similar_monthly_variations(time_series, years):
             for j in range(first_months[i] - 1):
                 first.insert(j, None)
         if first_months[i] != first_months[i + 1] - 1:
-            for j in range(first_months[i] + 1, first_months[i + 1]):
-                first.insert(first_months[i], None) # da vedere
+            for j in range(first_months[i], first_months[i + 1] - 1):
+                first.insert(j, None) # da vedere
     if first_months[-1] != 12:
         for i in range(12 - first_months[-1]):
             first.append(None)
@@ -167,8 +167,8 @@ def detect_similar_monthly_variations(time_series, years):
             for j in range(second_months[i] - 1):
                 second.insert(j, None)
         if second_months[i] != second_months[i + 1] - 1:
-            for j in range(second_months[i] + 1, second_months[i + 1]):
-                first.insert(second_months[i], None)
+            for j in range(second_months[i], second_months[i + 1] - 1):
+                second.insert(j, None)
     if second_months[-1] != 12:
         for i in range(12 - second_months[-1]):
             second.append(None)
