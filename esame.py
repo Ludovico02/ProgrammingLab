@@ -1,9 +1,7 @@
 '''
 - se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezzione
 - la data deve avere il -
-- gli anni possono essere messi in ordine decrescente?
 - per verificare se c'è un duplicato mi basterebbe controllare l'anno prima visto che altrimenti viene alzata l'eccezione di anno o mese fuori ordine
-- togliere abs
 '''
 
 class ExamException(Exception):
@@ -104,6 +102,8 @@ class CSVTimeSeriesFile():
 def detect_similar_monthly_variations(time_series, years):
     if len(years) > 2:
         raise ExamException("Non deve avere più di 2 valori")
+    if len(years) < 2:
+        raise ExamException("Deve avere 2 valori")
 
     try:
         years[0] = int(years[0])
@@ -121,9 +121,9 @@ def detect_similar_monthly_variations(time_series, years):
     # verifico che gli anni inseriti siano presenti all'interno di time_series
     first_found, second_found = False, False
     for list in time_series:
-        if str(years[0]) in list[0] and first_found == False:
+        if str(years[0]) in list[0]:
             first_found = True
-        if str(years[1]) in list[0] and second_found == False:
+        if str(years[1]) in list[0]:
             second_found = True
         if first_found and second_found:
             break
@@ -157,19 +157,10 @@ def detect_similar_monthly_variations(time_series, years):
             finale.append(True)
         else:
             finale.append(False)
-    # for i in range(11 - len(finale)):
-    #     finale.append(False)
     print(finale, len(finale)) # return
 
-'''
 time_series_file = CSVTimeSeriesFile(name='data.csv')
-time_series = time_series_file.get_data()
-print(time_series)
-
-detect_similar_monthly_variations(time_series, [1949, 1950])
-'''
-time_series_file = CSVTimeSeriesFile(name='prove.csv')
 time_series = time_series_file.get_data()
 print(time_series, len(time_series))
 
-detect_similar_monthly_variations(time_series, [1949, 1950])
+detect_similar_monthly_variations(time_series, [1951, 1952])
