@@ -1,6 +1,17 @@
 '''
-- se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezzione
-- la data deve avere il -
+Ludovico Gardenal    SM3201284    24/02/2022
+
+e-mail: ludovico@gardenal.eu
+
+Secondo appello esame Laboratorio di Programmazione
+
+Assegnazione:
+    https://docs.google.com/document/u/2/d/e/2PACX-1vTmonUDgUGNJ6aQA8lCcVinCXiW6a_DTj8UY6pVMMAbi3HgM3Y80pzkimrE1zITS-UX3mXlE4fYj0gH/pub
+'''
+
+'''
+- se il file è vuoto semplicemente non sono presenti gli anni in time_series quindi si alza un eccezione
+- la data deve essere di tipo Y-m
 '''
 
 class ExamException(Exception):
@@ -149,8 +160,3 @@ def detect_similar_monthly_variations(time_series, years):
         else:
             finale.append(False)
     return finale
-
-# time_series_file = CSVTimeSeriesFile(name='data.csv')
-# time_series = time_series_file.get_data()
-
-# print(detect_similar_monthly_variations(time_series, [1949, 1950]))
